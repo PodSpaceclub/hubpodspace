@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite does not support enums - we use String with validation in code
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("PARTNER") // ADMIN | PARTNER
+  partner   Partner?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Partner {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  slug        String   @unique
+  description String?
+  logo        String?
+  banner      String?
+  whatsapp    String
+  phone       String?
+  category    String?
+  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  products    Product[]
+  orders      Order[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  partnerId   String
+  partner     Partner     @relation(fields: [partnerId], references: [id])
+  name        String
+  description String?
+  price       Float
+  image       String?
+  stock       Int?
+  active      Boolean     @default(true)
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  partnerId     String
+  partner       Partner     @relation(fields: [partnerId], references: [id])
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  items         OrderItem[]
+  total         Float
+  commission    Float
+  partnerAmount Float
+  status        String      @default("PENDING") // PENDING | PAID | PROCESSING | DELIVERED | CANCELLED
+  stripeId      String?
+  sourceCode    String?
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model TrackingCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  label       String
+  description String?
+  orders      Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
