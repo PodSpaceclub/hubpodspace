@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { StoreCard } from "@/components/consumer/StoreCard";
 import { Search, Headphones, Radio, Zap, Mic2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 async function getPartners() {
   return prisma.partner.findMany({
@@ -31,8 +32,8 @@ export default async function MarketplacePage() {
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-lg border-b border-[#E8E8E8]">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Link href="/loja" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/isotipo-preto.svg" alt="" className="w-6 h-8 flex-shrink-0" />
-            <img src="/logo-principal-preto.svg" alt="PodSpace" className="h-6 hidden sm:block" />
+            <Image src="/isotipo-preto.svg" alt="" width={24} height={32} className="flex-shrink-0" unoptimized />
+            <Image src="/logo-principal-preto.svg" alt="PodSpace" width={180} height={24} className="h-6 w-auto hidden sm:block" unoptimized />
           </Link>
 
           <div className="flex-1 max-w-md">
@@ -70,7 +71,7 @@ export default async function MarketplacePage() {
         <div className="relative max-w-6xl mx-auto px-4 text-center">
           {/* Isotipo */}
           <div className="flex justify-center mb-6">
-            <img src="/isotipo-branco.svg" alt="PodSpace" className="w-12 h-16" />
+            <Image src="/isotipo-branco.svg" alt="PodSpace" width={48} height={64} unoptimized />
           </div>
 
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm text-white mb-6">
@@ -170,7 +171,7 @@ export default async function MarketplacePage() {
       <footer className="border-t border-[#E8E8E8] py-8 bg-[#F5F5F5]">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="/isotipo-preto.svg" alt="" className="w-4 h-5 opacity-40" />
+            <Image src="/isotipo-preto.svg" alt="" width={16} height={20} className="opacity-40" unoptimized />
             <span className="font-display text-sm font-600 text-[#666666] uppercase">
               PodSpace Club © {new Date().getFullYear()}
             </span>

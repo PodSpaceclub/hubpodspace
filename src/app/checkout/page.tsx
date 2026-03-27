@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Lock, ShoppingCart, ChevronRight } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -223,7 +224,7 @@ export default function CheckoutPage() {
             <ArrowLeft className="h-4 w-4 text-[#666666]" />
           </button>
           <div className="flex items-center gap-2">
-            <img src="/isotipo-preto.svg" alt="" className="w-5 h-7" />
+            <Image src="/isotipo-preto.svg" alt="" width={20} height={28} unoptimized />
             <span className="font-display text-lg font-700 text-[#1A1A1A] uppercase">
               Checkout
             </span>

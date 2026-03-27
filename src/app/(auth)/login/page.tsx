@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Lock, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +69,7 @@ export default function LoginPage() {
         <div className="relative z-10 text-center max-w-md">
           {/* Logo mark */}
           <div className="flex justify-center mb-8">
-            <img src="/isotipo-branco.svg" alt="PodSpace" className="w-16 h-20" />
+            <Image src="/isotipo-branco.svg" alt="PodSpace" width={64} height={80} unoptimized />
           </div>
 
           {/* Sound wave */}
@@ -83,7 +84,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-center mb-2">
-            <img src="/logo-principal-branco.svg" alt="PodSpace" className="h-12" />
+            <Image src="/logo-principal-branco.svg" alt="PodSpace" width={240} height={48} className="h-12 w-auto" unoptimized />
           </div>
           <p className="text-white/80 text-lg font-medium mb-3">
             Hub de Parceiros
@@ -126,8 +127,8 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Logo for mobile */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <img src="/isotipo-preto.svg" alt="" className="w-7 h-9 flex-shrink-0" />
-            <img src="/logo-principal-preto.svg" alt="PodSpace" className="h-7" />
+            <Image src="/isotipo-preto.svg" alt="" width={28} height={36} className="flex-shrink-0" unoptimized />
+            <Image src="/logo-principal-preto.svg" alt="PodSpace" width={210} height={28} className="h-7 w-auto" unoptimized />
           </div>
 
           <div className="mb-8">

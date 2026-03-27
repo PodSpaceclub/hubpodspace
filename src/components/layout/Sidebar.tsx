@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
@@ -71,8 +72,8 @@ export function Sidebar({ role = "PARTNER" }: SidebarProps) {
       {/* Logo */}
       <div className="p-6 border-b border-[#E8E8E8]">
         <Link href={role === "ADMIN" ? "/admin" : "/dashboard"} className="flex items-center gap-3">
-          <img src="/isotipo-preto.svg" alt="" className="w-8 h-10 flex-shrink-0" />
-          <img src="/logo-principal-preto.svg" alt="PodSpace" className="h-7" />
+          <Image src="/isotipo-preto.svg" alt="" width={32} height={40} className="flex-shrink-0" unoptimized />
+          <Image src="/logo-principal-preto.svg" alt="PodSpace" width={210} height={28} className="h-7 w-auto" unoptimized />
         </Link>
       </div>
 
