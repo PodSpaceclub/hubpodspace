@@ -23,36 +23,41 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-          include: { partner: true },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+            include: { partner: true },
+          });
 
-        if (!user) return null;
+          if (!user) return null;
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
 
-        if (!isPasswordValid) return null;
+          if (!isPasswordValid) return null;
 
-        if (user.role === "PARTNER" && user.partner?.status === "PENDING") {
-          throw new Error("PENDING_APPROVAL");
+          if (user.role === "PARTNER" && user.partner?.status === "PENDING") {
+            throw new Error("PENDING_APPROVAL");
+          }
+
+          if (user.role === "PARTNER" && user.partner?.status === "REJECTED") {
+            throw new Error("ACCOUNT_REJECTED");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            partnerId: user.partner?.id,
+            partnerSlug: user.partner?.slug,
+            partnerStatus: user.partner?.status,
+          } as any;
+        } catch (error) {
+          console.error("[auth] authorize error:", error);
+          return null;
         }
-
-        if (user.role === "PARTNER" && user.partner?.status === "REJECTED") {
-          throw new Error("ACCOUNT_REJECTED");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          partnerId: user.partner?.id,
-          partnerSlug: user.partner?.slug,
-          partnerStatus: user.partner?.status,
-        } as any;
       },
     }),
   ],

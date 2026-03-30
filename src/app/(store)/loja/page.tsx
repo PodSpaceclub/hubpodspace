@@ -7,13 +7,18 @@ import Link from "next/link";
 import Image from "next/image";
 
 async function getPartners() {
-  return prisma.partner.findMany({
-    where: { status: "APPROVED" },
-    include: {
-      _count: { select: { products: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    return await prisma.partner.findMany({
+      where: { status: "APPROVED" },
+      include: {
+        _count: { select: { products: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.error("[loja] Erro ao buscar parceiros:", error);
+    return [];
+  }
 }
 
 const categories = [
