@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { prisma } from "@/lib/db";
 import { StoreCard } from "@/components/consumer/StoreCard";
 import { Search, Headphones, Radio, Zap, Mic2 } from "lucide-react";
