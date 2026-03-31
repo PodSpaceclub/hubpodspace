@@ -62,6 +62,14 @@ export default function ProductsPage() {
           prev.map((p) => (p.id === editProduct.id ? updated : p))
         );
         toast({ title: "Produto atualizado!", variant: "success" });
+        setEditProduct(undefined);
+        setShowForm(false);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast({
+          title: err.error || "Erro ao atualizar produto",
+          variant: "error",
+        });
       }
     } else {
       // Create
@@ -74,10 +82,16 @@ export default function ProductsPage() {
         const created = await res.json();
         setProducts((prev) => [created, ...prev]);
         toast({ title: "Produto criado!", variant: "success" });
+        setEditProduct(undefined);
+        setShowForm(false);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast({
+          title: err.error || "Erro ao criar produto",
+          variant: "error",
+        });
       }
     }
-    setEditProduct(undefined);
-    setShowForm(false);
   };
 
   const handleDelete = async (id: string) => {

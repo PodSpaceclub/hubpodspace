@@ -86,7 +86,7 @@ export default async function MarketplacePage() {
             O marketplace do universo podcast
           </div>
 
-          <h1 className="font-display text-5xl md:text-7xl font-800 text-white uppercase mb-4 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-800 text-white uppercase mb-4 leading-tight">
             Hub de Parceiros
           </h1>
 

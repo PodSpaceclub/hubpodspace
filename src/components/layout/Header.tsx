@@ -23,7 +23,7 @@ export function Header({ title = "Dashboard", onMenuClick }: HeaderProps) {
           >
             <Menu className="h-5 w-5 text-[#666666]" />
           </button>
-          <h1 className="font-display text-2xl font-700 text-[#1A1A1A] uppercase tracking-wide">{title}</h1>
+          <h1 className="font-display text-xl sm:text-2xl font-700 text-[#1A1A1A] uppercase tracking-wide truncate max-w-[160px] sm:max-w-xs md:max-w-none">{title}</h1>
         </div>
 
         <div className="flex items-center gap-3">

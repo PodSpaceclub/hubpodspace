@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Upload, X, Loader2 } from "lucide-react";
 
 interface Product {
   id?: string;
@@ -39,6 +39,7 @@ export function ProductForm({
   title = "Novo Produto",
 }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<Omit<Product, "id">>({
     name: initialData?.name || "",
     description: initialData?.description || "",
@@ -48,6 +49,7 @@ export function ProductForm({
     active: initialData?.active ?? true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -69,68 +71,118 @@ export function ProductForm({
     }
   };
 
-  const sampleImages = [
-    "https://picsum.photos/seed/food1/400/300",
-    "https://picsum.photos/seed/food2/400/300",
-    "https://picsum.photos/seed/food3/400/300",
-    "https://picsum.photos/seed/prod1/400/300",
-  ];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({ ...prev, image: "Apenas imagens são permitidas" }));
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, image: "Imagem deve ter no máximo 5MB" }));
+      return;
+    }
+
+    setErrors((prev) => ({ ...prev, image: "" }));
+    setUploading(true);
+
+    try {
+      const data = new FormData();
+      data.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: data,
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        setErrors((prev) => ({ ...prev, image: err.error || "Erro ao enviar imagem" }));
+        return;
+      }
+
+      const { url } = await res.json();
+      setFormData((f) => ({ ...f, image: url }));
+    } catch {
+      setErrors((prev) => ({ ...prev, image: "Erro ao enviar imagem" }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((f) => ({ ...f, image: "" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Image preview */}
+          {/* Image upload */}
           <div>
             <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
               Imagem do Produto
             </label>
+
+            {/* Preview */}
             <div className="relative h-40 rounded-xl overflow-hidden bg-[#F5F5F5] border border-[#E8E8E8] mb-2">
-              {formData.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={formData.image}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
+              {uploading ? (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#3B3BFF]">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                  <span className="text-xs text-[#666666]">Enviando imagem...</span>
+                </div>
+              ) : formData.image ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5 text-white" />
+                  </button>
+                </>
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[#999999]">
                   <ImageIcon className="h-8 w-8" />
-                  <span className="text-xs">Selecione uma imagem abaixo</span>
+                  <span className="text-xs">Nenhuma imagem selecionada</span>
                 </div>
               )}
             </div>
-            <div className="flex gap-2 flex-wrap">
-              {sampleImages.map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setFormData((f) => ({ ...f, image: img }))}
-                  className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
-                    formData.image === img
-                      ? "border-[#3B3BFF]"
-                      : "border-[#E8E8E8] hover:border-[#3B3BFF]/50"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-              <div className="flex-1">
-                <Input
-                  placeholder="URL da imagem"
-                  value={formData.image || ""}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, image: e.target.value }))
-                  }
-                  className="h-12 text-xs"
-                />
-              </div>
-            </div>
+
+            {/* Upload button */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-[#E8E8E8] hover:border-[#3B3BFF] rounded-xl py-3 px-4 text-sm text-[#666666] hover:text-[#3B3BFF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? "Enviando..." : formData.image ? "Trocar imagem" : "Selecionar imagem do dispositivo"}
+            </button>
+            {errors.image && (
+              <p className="text-xs text-red-500 mt-1">{errors.image}</p>
+            )}
+            <p className="text-xs text-[#999999] mt-1">PNG, JPG, WEBP — máximo 5MB</p>
           </div>
 
           <Input
@@ -151,7 +203,7 @@ export function ProductForm({
             rows={3}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Preço (R$) *"
               type="number"
@@ -198,7 +250,7 @@ export function ProductForm({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" loading={loading}>
+            <Button type="submit" loading={loading} disabled={uploading}>
               {initialData?.id ? "Salvar Alterações" : "Criar Produto"}
             </Button>
           </DialogFooter>

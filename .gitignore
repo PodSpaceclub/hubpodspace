@@ -48,3 +48,7 @@ next-env.d.ts
 .vercel
 .turbo
 tsc-*.txt
+
+# User uploaded files (persist via UPLOAD_DIR env var in production)
+public/uploads/*
+!public/uploads/.gitkeep
