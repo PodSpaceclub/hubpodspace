@@ -66,10 +66,9 @@ export default function ProductsPage() {
         setShowForm(false);
       } else {
         const err = await res.json().catch(() => ({}));
-        toast({
-          title: err.error || "Erro ao atualizar produto",
-          variant: "error",
-        });
+        const msg = err.error || "Erro ao atualizar produto";
+        toast({ title: msg, variant: "error" });
+        throw new Error(msg);
       }
     } else {
       // Create
@@ -86,10 +85,9 @@ export default function ProductsPage() {
         setShowForm(false);
       } else {
         const err = await res.json().catch(() => ({}));
-        toast({
-          title: err.error || "Erro ao criar produto",
-          variant: "error",
-        });
+        const msg = err.error || "Erro ao criar produto";
+        toast({ title: msg, variant: "error" });
+        throw new Error(msg);
       }
     }
   };
