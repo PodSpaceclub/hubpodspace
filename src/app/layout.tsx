@@ -17,6 +17,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
