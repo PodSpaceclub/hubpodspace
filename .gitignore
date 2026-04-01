@@ -52,3 +52,6 @@ tsc-*.txt
 # User uploaded files (persist via UPLOAD_DIR env var in production)
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Next.js static files copied for direct Nginx serving
+public/_next/
