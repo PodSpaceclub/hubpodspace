@@ -32,9 +32,9 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
-        {/* CSS failure detection: reloads page once if Tailwind failed to load */}
+        {/* CSS failure detection: reloads page once per navigation if Tailwind failed to load */}
         <script dangerouslySetInnerHTML={{
-          __html: `(function(){window.addEventListener('load',function(){if(sessionStorage.getItem('css_ok'))return;var d=document.createElement('div');d.className='hidden';document.body.appendChild(d);var ok=window.getComputedStyle(d).display==='none';document.body.removeChild(d);if(ok){sessionStorage.setItem('css_ok','1');}else if(!sessionStorage.getItem('css_retry')){sessionStorage.setItem('css_retry','1');location.reload(true);}});})();`
+          __html: `(function(){window.addEventListener('load',function(){var d=document.createElement('div');d.className='hidden';document.body.appendChild(d);var ok=window.getComputedStyle(d).display==='none';document.body.removeChild(d);if(ok){sessionStorage.removeItem('css_retry');}else if(!sessionStorage.getItem('css_retry')){sessionStorage.setItem('css_retry','1');location.reload(true);}});})();`
         }} />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">

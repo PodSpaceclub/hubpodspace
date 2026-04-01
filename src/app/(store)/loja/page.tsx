@@ -55,7 +55,7 @@ export default async function MarketplacePage() {
           </div>
 
           <Link
-            href="/login"
+            href="/register"
             className="flex-shrink-0 text-sm text-[#E85A00] hover:text-[#CC4D00] transition-colors font-semibold"
           >
             Seja Parceiro
