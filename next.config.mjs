@@ -24,6 +24,7 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client", "bcryptjs"],
+    instrumentationHook: true,
   },
 };
 
