@@ -34,7 +34,13 @@ export default function ProductsPage() {
       if (res.ok) {
         const data = await res.json();
         setProducts(data);
+      } else {
+        console.error("[products] fetchProducts error:", res.status);
+        toast({ title: "Erro ao carregar produtos. Recarregue a página.", variant: "error" });
       }
+    } catch (err) {
+      console.error("[products] fetchProducts exception:", err);
+      toast({ title: "Erro de conexão. Recarregue a página.", variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -234,6 +240,7 @@ export default function ProductsPage() {
       <MobileNav role="PARTNER" />
 
       <ProductForm
+        key={editProduct?.id ?? "new"}
         open={showForm}
         onClose={() => {
           setShowForm(false);

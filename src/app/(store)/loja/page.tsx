@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { prisma } from "@/lib/db";
 import { StoreCard } from "@/components/consumer/StoreCard";
-import { Search, Headphones, Radio, Zap, Mic2 } from "lucide-react";
+import { Headphones, Radio, Zap, Mic2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -21,15 +21,6 @@ async function getPartners() {
   }
 }
 
-const categories = [
-  { label: "Todos", icon: "🎙️", value: "" },
-  { label: "Alimentação", icon: "🍕", value: "Alimentação" },
-  { label: "Bebidas", icon: "☕", value: "Bebidas" },
-  { label: "Tecnologia", icon: "💻", value: "Tecnologia" },
-  { label: "Serviços", icon: "⚙️", value: "Serviços" },
-  { label: "Saúde", icon: "💚", value: "Saúde & Bem-estar" },
-];
-
 export default async function MarketplacePage() {
   const partners = await getPartners();
 
@@ -42,17 +33,6 @@ export default async function MarketplacePage() {
             <Image src="/isotipo-preto.svg" alt="" width={24} height={32} className="flex-shrink-0" unoptimized />
             <Image src="/logo-principal-preto.svg" alt="PodSpace" width={180} height={24} className="h-6 w-auto hidden sm:block" unoptimized />
           </Link>
-
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#666666]" />
-              <input
-                type="text"
-                placeholder="Buscar lojas e produtos..."
-                className="w-full bg-[#F5F5F5] border border-[#E8E8E8] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1A1A1A] placeholder:text-[#666666] focus:outline-none focus:border-[#3B3BFF] transition-colors"
-              />
-            </div>
-          </div>
 
           <Link
             href="/register"
@@ -113,21 +93,6 @@ export default async function MarketplacePage() {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* Category filters */}
-      <section className="max-w-6xl mx-auto px-4 mb-8 mt-8">
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8] hover:border-[#3B3BFF] hover:bg-[#3B3BFF]/05 text-sm font-medium text-[#1A1A1A] whitespace-nowrap transition-all flex-shrink-0"
-            >
-              <span>{cat.icon}</span>
-              {cat.label}
-            </button>
-          ))}
         </div>
       </section>
 

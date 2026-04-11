@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
     const urlPrefix = process.env.UPLOAD_URL_PREFIX ?? "/uploads";
     const url = `${urlPrefix}/${filename}`;
 
-    return NextResponse.json({ url }, { status: 201 });
+    console.log(`[upload] saved: ${filepath} → ${url}`);
+    return NextResponse.json({ url });
   } catch (error) {
     console.error("[upload] error:", error);
     return NextResponse.json({ error: "Erro ao salvar imagem" }, { status: 500 });

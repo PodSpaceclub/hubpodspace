@@ -102,13 +102,14 @@ export function useCart() {
 }
 
 export function CartDrawer({ onClose }: { onClose: () => void }) {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, total, clearCart, partnerId } = useCart();
   const router = useRouter();
 
   const handleCheckout = () => {
     // Save cart to sessionStorage for checkout page
     sessionStorage.setItem("cart", JSON.stringify(items));
     sessionStorage.setItem("cartTotal", total.toString());
+    sessionStorage.setItem("partnerId", partnerId || "");
     onClose();
     router.push("/checkout");
   };
