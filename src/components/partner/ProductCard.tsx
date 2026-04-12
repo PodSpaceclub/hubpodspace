@@ -5,6 +5,7 @@ import { Edit2, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 interface Product {
   id: string;
@@ -24,16 +25,19 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onEdit, onDelete, onToggle }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden card-hover group">
       {/* Image */}
       <div className="relative h-48 overflow-hidden bg-[#F5F5F5]">
-        {product.image ? (
+        {product.image && !imgError ? (
           <Image
             src={product.image}
             alt={product.name}
             fill
             className="object-cover product-img"
+            onError={() => setImgError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

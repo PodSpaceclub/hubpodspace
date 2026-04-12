@@ -33,8 +33,13 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Determine upload directory — configurable via env var for production
-    const uploadDir = process.env.UPLOAD_DIR ?? path.join(process.cwd(), "public", "uploads");
+    // Determine upload directory.
+    // Default: one level above the app directory (outside git) so files
+    // persist across redeployments on Hostinger.
+    // Override by setting UPLOAD_DIR env var.
+    const uploadDir =
+      process.env.UPLOAD_DIR ??
+      path.join(process.cwd(), "..", "uploads");
 
     // Ensure directory exists
     await mkdir(uploadDir, { recursive: true });
@@ -46,8 +51,10 @@ export async function POST(req: NextRequest) {
 
     await writeFile(filepath, buffer);
 
-    // Determine public URL
-    const urlPrefix = process.env.UPLOAD_URL_PREFIX ?? "/uploads";
+    // Determine public URL.
+    // Default: served via /api/files/[filename] Next.js route.
+    // Override by setting UPLOAD_URL_PREFIX env var.
+    const urlPrefix = process.env.UPLOAD_URL_PREFIX ?? "/api/files";
     const url = `${urlPrefix}/${filename}`;
 
     console.log(`[upload] saved: ${filepath} → ${url}`);
