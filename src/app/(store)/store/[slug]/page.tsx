@@ -13,7 +13,10 @@ export default async function StorePage({ params }: Props) {
     where: { slug: params.slug, status: "APPROVED" },
     include: {
       products: {
-        where: { active: true },
+        where: {
+          active: true,
+          OR: [{ stock: null }, { stock: { gt: 0 } }],
+        },
         orderBy: { createdAt: "desc" },
       },
     },

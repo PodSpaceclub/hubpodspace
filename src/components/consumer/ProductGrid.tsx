@@ -43,13 +43,23 @@ function ProductItem({
             {product.description}
           </p>
         )}
+        {product.stock !== null && product.stock !== undefined && (
+          <p className="text-xs mb-2 font-medium">
+            {product.stock > 0 ? (
+              <span className="text-[#666666]">{product.stock} disponível</span>
+            ) : (
+              <span className="text-red-500">Esgotado</span>
+            )}
+          </p>
+        )}
         <div className="flex items-center justify-between">
           <span className="font-bold text-[#3B3BFF]">
             {formatCurrency(product.price)}
           </span>
           <button
-            onClick={() => onAdd(product)}
-            className="w-8 h-8 rounded-full bg-[#E85A00] hover:bg-[#CC4D00] flex items-center justify-center transition-all hover:scale-110"
+            onClick={() => product.stock === 0 ? undefined : onAdd(product)}
+            disabled={product.stock === 0}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 bg-[#E85A00] hover:bg-[#CC4D00]"
           >
             <Plus className="h-4 w-4 text-white" />
           </button>

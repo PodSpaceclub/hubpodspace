@@ -14,6 +14,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
 
 const stripePromise = loadStripe(
@@ -66,7 +67,21 @@ function PaymentForm({
       setErrorMsg(error.message ?? "Erro ao processar pagamento.");
       setLoading(false);
     } else {
-      // Payment confirmed successfully
+      // Payment confirmed — update order status to PAID in the database
+      try {
+        const lastOrder = JSON.parse(sessionStorage.getItem("lastOrder") || "{}");
+        if (lastOrder?.id) {
+          await fetch(`/api/orders/${lastOrder.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "PAID" }),
+          });
+        }
+      } catch {
+        // Non-critical: status will still show in partner panel even if this fails
+        console.error("[checkout] Failed to update order status to PAID");
+      }
+
       sessionStorage.removeItem("cart");
       sessionStorage.removeItem("cartTotal");
       sessionStorage.removeItem("partnerId");
@@ -132,7 +147,7 @@ export default function CheckoutPage() {
   const [total, setTotal] = useState(0);
   const [step, setStep] = useState<"info" | "payment">("info");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -147,6 +162,8 @@ export default function CheckoutPage() {
     if (!form.name.trim()) newErrors.name = "Nome é obrigatório";
     if (!form.email.trim() || !form.email.includes("@"))
       newErrors.email = "Email inválido";
+    if (!form.phone.trim()) newErrors.phone = "WhatsApp é obrigatório";
+    if (!form.address.trim()) newErrors.address = "Endereço de entrega é obrigatório";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -168,6 +185,7 @@ export default function CheckoutPage() {
           customerName: form.name,
           customerEmail: form.email,
           customerPhone: form.phone,
+          customerAddress: form.address,
           items: cartItems.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,
@@ -310,13 +328,24 @@ export default function CheckoutPage() {
                   error={errors.email}
                 />
                 <Input
-                  label="WhatsApp (opcional)"
+                  label="WhatsApp *"
                   type="tel"
                   placeholder="+55 11 99999-9999"
                   value={form.phone}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, phone: e.target.value }))
                   }
+                  error={errors.phone}
+                />
+                <Textarea
+                  label="Endereço de entrega *"
+                  placeholder="Rua, número, bairro, cidade, CEP..."
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, address: e.target.value }))
+                  }
+                  rows={3}
+                  error={errors.address}
                 />
 
                 <Button

@@ -22,6 +22,7 @@ interface Order {
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
+  customerAddress?: string;
   items: OrderItem[];
   total: number;
   partnerAmount: number;
@@ -52,7 +53,7 @@ const nextStatusLabel: Record<string, string> = {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("PAID");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -190,8 +191,9 @@ export default function OrdersPage() {
 
                   {/* Expanded details */}
                   {expandedId === order.id && (
-                    <div className="border-t border-[#E8E8E8] p-4 bg-[#F5F5F5]">
-                      <div className="space-y-2 mb-3">
+                    <div className="border-t border-[#E8E8E8] p-4 bg-[#F5F5F5] space-y-3">
+                      {/* Items */}
+                      <div className="space-y-2">
                         {order.items.map((item) => (
                           <div
                             key={item.id}
@@ -206,17 +208,43 @@ export default function OrdersPage() {
                           </div>
                         ))}
                       </div>
+
+                      {/* Delivery address */}
+                      {order.customerAddress && (
+                        <div className="text-sm bg-white border border-[#E8E8E8] rounded-lg p-3">
+                          <p className="text-xs text-[#666666] mb-0.5 font-medium">Endereço de entrega</p>
+                          <p className="text-[#1A1A1A]">{order.customerAddress}</p>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between border-t border-[#E8E8E8] pt-3">
                         <span className="text-sm text-[#666666]">
                           {formatDateTime(order.createdAt)}
                         </span>
-                        <div className="text-right text-sm">
-                          <p className="text-[#666666]">
-                            Sua receita:{" "}
-                            <span className="text-green-600 font-semibold">
-                              {formatCurrency(order.partnerAmount)}
-                            </span>
-                          </p>
+                        <div className="flex items-center gap-3">
+                          {!["DELIVERED", "CANCELLED"].includes(order.status) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-400"
+                              loading={updatingId === order.id}
+                              onClick={() => {
+                                if (confirm("Confirmar cancelamento do pedido?")) {
+                                  updateStatus(order.id, "CANCELLED");
+                                }
+                              }}
+                            >
+                              Cancelar Pedido
+                            </Button>
+                          )}
+                          <div className="text-right text-sm">
+                            <p className="text-[#666666]">
+                              Sua receita:{" "}
+                              <span className="text-green-600 font-semibold">
+                                {formatCurrency(order.partnerAmount)}
+                              </span>
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>

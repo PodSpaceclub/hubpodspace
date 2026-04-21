@@ -24,11 +24,14 @@ interface Product {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | undefined>();
 
   const fetchProducts = async () => {
+    setFetchError(null);
+    setLoading(true);
     try {
       const res = await fetch("/api/products");
       if (res.ok) {
@@ -36,11 +39,13 @@ export default function ProductsPage() {
         setProducts(data);
       } else {
         console.error("[products] fetchProducts error:", res.status);
-        toast({ title: "Erro ao carregar produtos. Recarregue a página.", variant: "error" });
+        setFetchError("Não foi possível carregar os produtos. Verifique sua conexão.");
+        toast({ title: "Erro ao carregar produtos.", variant: "error" });
       }
     } catch (err) {
       console.error("[products] fetchProducts exception:", err);
-      toast({ title: "Erro de conexão. Recarregue a página.", variant: "error" });
+      setFetchError("Erro de conexão ao carregar produtos.");
+      toast({ title: "Erro de conexão.", variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -188,7 +193,19 @@ export default function ProductsPage() {
           </div>
 
           {/* Products Grid */}
-          {loading ? (
+          {fetchError ? (
+            <div className="text-center py-16">
+              <Package className="h-12 w-12 mx-auto mb-4 text-[#CCCCCC]" />
+              <p className="text-red-500 font-medium mb-2">{fetchError}</p>
+              <Button
+                variant="outline"
+                className="border-[#E8E8E8] text-[#1A1A1A]"
+                onClick={fetchProducts}
+              >
+                Tentar novamente
+              </Button>
+            </div>
+          ) : loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div

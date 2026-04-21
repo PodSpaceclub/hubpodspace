@@ -43,7 +43,7 @@ async function getPartnerStats(partnerId: string) {
       prisma.product.count({ where: { partnerId, active: true } }),
       prisma.order.count({ where: { partnerId, status: "PENDING" } }),
       prisma.order.findMany({
-        where: { partnerId },
+        where: { partnerId, status: { notIn: ["PENDING"] } },
         take: 5,
         orderBy: { createdAt: "desc" },
         include: { items: { include: { product: true } } },

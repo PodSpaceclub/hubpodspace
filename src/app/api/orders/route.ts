@@ -39,20 +39,30 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { partnerId, customerName, customerEmail, customerPhone, items, sourceCode, notes } = body;
+    const { partnerId, customerName, customerEmail, customerPhone, customerAddress, items, sourceCode, notes } = body;
 
-    if (!partnerId || !customerName || !customerEmail || !items?.length) {
+    if (!partnerId || !customerName || !customerEmail || !customerAddress || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Calculate total from database prices (never trust client prices)
+    // Also check stock availability before proceeding
     let total = 0;
-    const itemsWithPrices = [];
+    const itemsWithPrices: { productId: string; quantity: number; price: number }[] = [];
     for (const item of items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } });
       if (!product) {
         return NextResponse.json({ error: `Product ${item.productId} not found` }, { status: 400 });
       }
+
+      // Stock check: if product has a stock limit, ensure enough is available
+      if (product.stock !== null && product.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `Produto "${product.name}" não tem estoque suficiente (disponível: ${product.stock})` },
+          { status: 400 }
+        );
+      }
+
       total += product.price * item.quantity;
       itemsWithPrices.push({ ...item, price: product.price });
     }
@@ -79,6 +89,7 @@ export async function POST(req: NextRequest) {
         customerName,
         customerEmail,
         customerPhone,
+        customerAddress,
         total,
         commission,
         partnerAmount,
@@ -99,6 +110,14 @@ export async function POST(req: NextRequest) {
         partner: true,
       },
     });
+
+    // Decrement stock for products that have stock tracking enabled
+    for (const item of itemsWithPrices) {
+      await prisma.product.updateMany({
+        where: { id: item.productId, stock: { not: null } },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
 
     return NextResponse.json(
       { ...order, clientSecret: paymentIntent.client_secret },
